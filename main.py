@@ -132,12 +132,13 @@ if __name__ == '__main__':
     net_glob.apply(weights_init)    
 
     def cliet_train(q, device_id, net_glob, iters, idx, val_id=server_id, generator=None):
-        device=torch.device('cuda:{}'.format(device_id) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
+        # device=torch.device('cuda:{}'.format(device_id) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
+        device=torch.device('cpu')
         lr = lr_schedule(args.lr, iters, args.rounds)  
 
         if args.local_sch == "adaptive":
             running_ep = adaptive_schedule(args.local_ep, args.epochs, iters, args.adap_ep)
-        if running_ep != args.local_ep:
+        if 'running_ep' in locals() and running_ep != args.local_ep:
             print("Using adaptive scheduling, local ep = %d."%args.adap_ep)
         else:
             running_ep = args.local_ep
