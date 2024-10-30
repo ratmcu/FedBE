@@ -25,6 +25,10 @@ pip install torch
 pip install scikit-learn
 ```
 
+```
+./run.sh
+```
+
 ## Citation
 This repository also implements parallelized client training in PyTorch. Please cite us if you find it useful.  
 Please email chen.9301[at]osu.edu for questions. Thank you.
