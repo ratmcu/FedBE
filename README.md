@@ -14,6 +14,17 @@ method but leave other parts of your federated learning algorithm intact
 
 ![](fedbe.png)
 
+## how to run
+```
+python -m  venv ./venv
+git clone git@github.com:ratmcu/FedBE.git
+. venv/bin/activate
+pip install matplotlib
+pip install seaborn
+pip install torch
+pip install scikit-learn
+```
+
 ## Citation
 This repository also implements parallelized client training in PyTorch. Please cite us if you find it useful.  
 Please email chen.9301[at]osu.edu for questions. Thank you.
