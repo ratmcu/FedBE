@@ -175,24 +175,24 @@ if __name__ == '__main__':
         q.put([acc, loss])
         return [acc, loss]
 
-    def eval(net_glob, gpu, tag='', server_id=None):
+    def eval(net_glob, tag='', server_id=None):
         # testing
         q = mp.Manager().Queue()
 
-        p_tr = mp.Process(target=test_thread, args=(q, gpu, net_glob, dataset_eval, train_ids))  
+        p_tr = mp.Process(target=test_thread, args=(q, args, net_glob, dataset_eval, train_ids))  
         p_tr.start()
         p_tr.join()
         [acc_train, loss_train] = q.get()
 
         q2 = mp.Manager().Queue()
-        p_te = mp.Process(target=test_thread, args=(q2, gpu, net_glob, dataset_test, range(len(dataset_test))))  
+        p_te = mp.Process(target=test_thread, args=(q2, args, net_glob, dataset_test, range(len(dataset_test))))  
         p_te.start()
         p_te.join()
 
         [acc_test,  loss_test] = q2.get()
 
         q3 = mp.Manager().Queue()
-        p_val = mp.Process(target=test_thread, args=(q3, gpu, net_glob, dataset_eval, server_id))
+        p_val = mp.Process(target=test_thread, args=(q3, args, net_glob, dataset_eval, server_id))
         p_val.start()
         p_val.join()
 
@@ -209,7 +209,7 @@ if __name__ == '__main__':
         return [acc_train, loss_train], [acc_test,  loss_test], [acc_val,  loss_val]
     
     def put_log(logger, net_glob, tag, iters=-1):
-        [acc_train, loss_train], [acc_test,  loss_test], [acc_val,  loss_val] = eval(net_glob, 'cpu', tag=tag, server_id=server_id)
+        [acc_train, loss_train], [acc_test,  loss_test], [acc_val,  loss_val] = eval(net_glob, tag=tag, server_id=server_id)
 
         if iters==0:
             open(os.path.join(args.acc_dir, tag+"_train_acc.txt"), "w")
