@@ -201,7 +201,11 @@ class ServerUpdate(object):
         else:  
           acc_cnt=np.sum(np.argmax(logits, axis=-1)==labels)
           cnt=len(labels)
-          logits = torch.Tensor(logits).cuda(non_blocking=True)  
+          if self.args.num_gpu != -1:
+            logits = torch.Tensor(logits).cuda(non_blocking=True)  
+          else:
+            logits = torch.Tensor(logits)
+            
 
 
         # For loss function
