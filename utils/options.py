@@ -47,7 +47,7 @@ def args_parser():
     parser.add_argument('--num_channels', type=int, default=3, help="number of channels of imges")
     parser.add_argument('--split_method', type=str, default='step', help='split_method, [step, dir]')
     
-    parser.add_argument('--logit_method', type=str, default='vote', help='vote, else')
+    parser.add_argument('--logit_method', type=str, default='else', help='vote, else')
     parser.add_argument('--is_logit', type=bool, default=False, help='True, False')
     parser.add_argument('--soft_vote', type=bool, default=False, help='True, False')
     
