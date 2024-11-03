@@ -196,7 +196,10 @@ class ServerUpdate(object):
             logits = np.argmax(logits, axis=-1)
           acc_cnt=np.sum(logits==labels)
           cnt=len(labels)
-          logits = torch.Tensor(logits).long().cuda(non_blocking=True)  
+          if self.args.num_gpu != -1:
+            logits = torch.Tensor(logits).long().cuda(non_blocking=True)  
+          else:
+            logits = torch.Tensor(logits).long()
             
         else:  
           acc_cnt=np.sum(np.argmax(logits, axis=-1)==labels)
@@ -223,8 +226,10 @@ class ServerUpdate(object):
             else:
               P = logits 
               Q = log_probs
-            
-            one_vec = (P * (P.log() - torch.Tensor([0.1]).cuda(non_blocking=True).log()))
+            if self.args.num_gpu != -1:
+              one_vec = (P * (P.log() - torch.Tensor([0.1]).cuda(non_blocking=True).log()))
+            else:
+              one_vec = (P * (P.log() - torch.Tensor([0.1]).log()))
             loss = (P * (P.log() - Q.log())).mean()
           else:
             loss = self.loss_func(log_probs, logits)
