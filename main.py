@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
     net_glob.apply(weights_init)    
 
-    def cliet_train(q, device_id, net_glob, iters, idx, val_id=server_id, generator=None):
+    def client_train(q, device_id, net_glob, iters, idx, val_id=server_id, generator=None):
         device=torch.device('cuda:{}'.format(device_id) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
         lr = lr_schedule(args.lr, iters, args.rounds)  
 
@@ -295,7 +295,7 @@ if __name__ == '__main__':
             q = mp.Manager().Queue()
             
             for idx in idxs_users[i:i+num_threads]:
-                p = mp.Process(target=cliet_train, args=(q, idx%(args.num_gpu), copy.deepcopy(net_glob), iters, idx, server_id, generator))
+                p = mp.Process(target=client_train, args=(q, idx%(args.num_gpu), copy.deepcopy(net_glob), iters, idx, server_id, generator))
                 p.start()
                 processes.append(p)
 
