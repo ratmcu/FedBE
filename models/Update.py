@@ -143,13 +143,19 @@ class ServerUpdate(object):
 
     def transform_train(self, images):
         images = random_crop(images, 4)
-        images = torch.Tensor(images).cuda()
+        if self.args.gpu != -1:
+          images = torch.Tensor(images).cuda()
+        else:
+          images = torch.Tensor(images)
         return images 
 
     def get_ensemble_logits(self, teachers, inputs, method='mean', global_ep=1000):
         logits = np.zeros((len(teachers), len(inputs), self.args.num_classes))
         for i, t_net in enumerate(teachers):
-          logit = get_input_logits(inputs, t_net.cuda(), is_logit = self.args.is_logit) #Disable res
+          if self.args.gpu != -1:
+            logit = get_input_logits(inputs, t_net.cuda(), is_logit = self.args.is_logit) #Disable res
+          else:
+            logit = get_input_logits(inputs, t_net, is_logit = self.args.is_logit) #Disable res
           logits[i] = logit
           
         logits = np.transpose(logits, (1, 0, 2)) # batchsize, teachers, 10
@@ -171,7 +177,8 @@ class ServerUpdate(object):
 
         else:
           for batch_idx, (images, labels) in enumerate(dataset):
-              images = images.cuda()
+              if self.args.num_gpu != -1: 
+                images = images.cuda()
               logits, _ = self.get_ensemble_logits(teachers, images, method=self.args.logit_method, global_ep=1000)
               
               if self.args.logit_method != "vote":
@@ -199,7 +206,10 @@ class ServerUpdate(object):
 
         # For loss function
         if self.args.use_oracle:
-          loss = nn.CrossEntropyLoss()(log_probs, torch.Tensor(labels).long().cuda())
+          if self.args.gpu != -1:
+            loss = nn.CrossEntropyLoss()(log_probs, torch.Tensor(labels).long().cuda())
+          else:
+            loss = nn.CrossEntropyLoss()(log_probs, torch.Tensor(labels).long())
         else:      
           if "KL" in self.loss_type:
             log_probs = F.softmax(log_probs, dim=-1)
@@ -218,8 +228,12 @@ class ServerUpdate(object):
         return loss, acc_cnt, cnt     
     
     def test_net(self, tmp_net):
-        tmp_net = tmp_net.cuda()
-        (input, label) = (self.eval_images.cuda(), self.eval_labels.cuda())
+        if self.args.gpu != -1:
+          tmp_net = tmp_net.cuda()
+          (input, label) = (self.eval_images.cuda(), self.eval_labels.cuda())
+        else:
+          (input, label) = (self.eval_images, self.eval_labels)
+          
         log_probs = tmp_net(input)
         loss = nn.CrossEntropyLoss()(log_probs, label)
         return not torch.isnan(loss)
@@ -245,7 +259,10 @@ class ServerUpdate(object):
         all_labels = np.zeros((num))
         cnt = 0
         for batch_idx, (images, labels) in enumerate(self.ldr_train):
-            logits, batch_entropy = self.get_ensemble_logits(teachers, images.cuda(), method=self.args.logit_method, global_ep=global_ep)
+            if self.args.gpu != -1:
+              logits, batch_entropy = self.get_ensemble_logits(teachers, images.cuda(), method=self.args.logit_method, global_ep=global_ep)
+            else:
+              logits, batch_entropy = self.get_ensemble_logits(teachers, images, method=self.args.logit_method, global_ep=global_ep)
             entropy.append(batch_entropy)
             
             all_images[cnt:cnt+len(images)] = images.numpy()
@@ -294,7 +311,8 @@ class ServerUpdate(object):
         (all_images, all_logits, all_labels) = ldr_train 
         #======================Server Train========================
         print("Start server training...")
-        net.cuda()        
+        if self.args.gpu != -1:
+          net.cuda()        
         net.train()
 
         epoch_loss = []
@@ -315,7 +333,10 @@ class ServerUpdate(object):
                 if self.aug:
                   images = self.transform_train(images)
                 else:
-                  images = torch.Tensor(images).cuda()   
+                  if self.args.gpu != -1:
+                    images = torch.Tensor(images).cuda()   
+                  else:
+                    images = torch.Tensot(images)
                 logits = all_logits[ids]
                 labels = all_labels[ids]
                 
