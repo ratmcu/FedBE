@@ -43,7 +43,7 @@ def args_parser():
     parser.add_argument('--dataset_trans', type=str, default='', help="Unsupervised dataset for server")
         
     parser.add_argument('--iid', action='store_true', help='whether i.i.d or not')
-    parser.add_argument('--num_classes', type=int, default=10, help="number of classes")
+    parser.add_argument('--num_classes', type=int, default=3, help="number of classes")
     parser.add_argument('--num_channels', type=int, default=3, help="number of channels of imges")
     parser.add_argument('--split_method', type=str, default='step', help='split_method, [step, dir]')
     
