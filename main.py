@@ -132,8 +132,7 @@ if __name__ == '__main__':
     net_glob.apply(weights_init)    
 
     def cliet_train(q, device_id, net_glob, iters, idx, val_id=server_id, generator=None):
-        # device=torch.device('cuda:{}'.format(device_id) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-        device=torch.device('cpu')
+        device=torch.device('cuda:{}'.format(device_id) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
         lr = lr_schedule(args.lr, iters, args.rounds)  
 
         if args.local_sch == "adaptive":
