@@ -22,6 +22,7 @@ git clone git@github.com:ratmcu/FedBE.git
 pip install matplotlib
 pip install seaborn
 pip install torch
+pip install torchvision
 pip install scikit-learn
 ```
 
