@@ -103,7 +103,7 @@ def cifar_noniid(dataset, num_users, num_data=50000, method="step"):
       idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
       idxs = idxs_labels[0,:]
       
-      least_idx = np.zeros((num_users, 10, _lst_sample), dtype=np.int32)
+      least_idx = np.zeros((num_users, 10, _lst_sample), dtype=int)
       for i in range(10):
         idx_i = np.random.choice(np.where(labels==i)[0], num_users*_lst_sample, replace=False)
         least_idx[:, i, :] = idx_i.reshape((num_users, _lst_sample))
@@ -131,7 +131,7 @@ def cifar_noniid(dataset, num_users, num_data=50000, method="step"):
       
       _lst_sample = 2
 
-      least_idx = np.zeros((num_users, 10, _lst_sample), dtype=np.int32)
+      least_idx = np.zeros((num_users, 10, _lst_sample), dtype=int)
       for i in range(10):
         idx_i = np.random.choice(np.where(labels==i)[0], num_users*_lst_sample, replace=False)
         least_idx[:, i, :] = idx_i.reshape((num_users, _lst_sample))
