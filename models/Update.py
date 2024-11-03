@@ -143,7 +143,7 @@ class ServerUpdate(object):
 
     def transform_train(self, images):
         images = random_crop(images, 4)
-        if self.args.gpu != -1:
+        if self.args.num_gpu != -1:
           images = torch.Tensor(images).cuda()
         else:
           images = torch.Tensor(images)
@@ -152,7 +152,7 @@ class ServerUpdate(object):
     def get_ensemble_logits(self, teachers, inputs, method='mean', global_ep=1000):
         logits = np.zeros((len(teachers), len(inputs), self.args.num_classes))
         for i, t_net in enumerate(teachers):
-          if self.args.gpu != -1:
+          if self.args.num_gpu != -1:
             logit = get_input_logits(inputs, t_net.cuda(), is_logit = self.args.is_logit) #Disable res
           else:
             logit = get_input_logits(inputs, t_net, is_logit = self.args.is_logit) #Disable res
@@ -206,7 +206,7 @@ class ServerUpdate(object):
 
         # For loss function
         if self.args.use_oracle:
-          if self.args.gpu != -1:
+          if self.args.num_gpu != -1:
             loss = nn.CrossEntropyLoss()(log_probs, torch.Tensor(labels).long().cuda())
           else:
             loss = nn.CrossEntropyLoss()(log_probs, torch.Tensor(labels).long())
@@ -228,7 +228,7 @@ class ServerUpdate(object):
         return loss, acc_cnt, cnt     
     
     def test_net(self, tmp_net):
-        if self.args.gpu != -1:
+        if self.args.num_gpu != -1:
           tmp_net = tmp_net.cuda()
           (input, label) = (self.eval_images.cuda(), self.eval_labels.cuda())
         else:
@@ -259,7 +259,7 @@ class ServerUpdate(object):
         all_labels = np.zeros((num))
         cnt = 0
         for batch_idx, (images, labels) in enumerate(self.ldr_train):
-            if self.args.gpu != -1:
+            if self.args.num_gpu != -1:
               logits, batch_entropy = self.get_ensemble_logits(teachers, images.cuda(), method=self.args.logit_method, global_ep=global_ep)
             else:
               logits, batch_entropy = self.get_ensemble_logits(teachers, images, method=self.args.logit_method, global_ep=global_ep)
@@ -311,7 +311,7 @@ class ServerUpdate(object):
         (all_images, all_logits, all_labels) = ldr_train 
         #======================Server Train========================
         print("Start server training...")
-        if self.args.gpu != -1:
+        if self.args.num_gpu != -1:
           net.cuda()        
         net.train()
 
@@ -333,7 +333,7 @@ class ServerUpdate(object):
                 if self.aug:
                   images = self.transform_train(images)
                 else:
-                  if self.args.gpu != -1:
+                  if self.args.num_gpu != -1:
                     images = torch.Tensor(images).cuda()   
                   else:
                     images = torch.Tensot(images)
