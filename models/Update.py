@@ -336,7 +336,7 @@ class ServerUpdate(object):
                   if self.args.num_gpu != -1:
                     images = torch.Tensor(images).cuda()   
                   else:
-                    images = torch.Tensot(images)
+                    images = torch.Tensor(images)
                 logits = all_logits[ids]
                 labels = all_labels[ids]
                 
